@@ -1,0 +1,236 @@
+#pragma once
+#include <fstream>
+#include "StringUtils.h"
+#include "Movie.h"
+#include "Serializable.h"
+#include "FileUtils.h"
+
+struct MovieList {
+	Movie** movies;
+	int size;
+	int capacity;
+};
+
+
+void initializeMovieList(MovieList& list, int initialCapacity = 2) {
+	list.movies = new Movie * [initialCapacity];
+	list.size = 0;
+	list.capacity = initialCapacity;
+	deserialize("s.txt", list.movies, list.size, list.capacity);
+}
+
+void destroyMovieList(MovieList& list) {
+	for (int i = 0; i < list.size; ++i) {
+		destroyMovie(*list.movies[i]);
+	}
+	delete[] list.movies;
+}
+
+void addMovieToList(MovieList& list, Movie* newMovie) {
+	if (!newMovie) {
+		std::cout << RED << "Error: Cannot add a null movie.\n" << RESET;
+		return;
+	}
+
+	if (list.size == list.capacity) {
+		list.capacity *= 2;
+		Movie** newMovies = new Movie * [list.capacity];
+		for (int i = 0; i < list.size; ++i) {
+			newMovies[i] = list.movies[i];
+		}
+		delete[] list.movies;
+		list.movies = newMovies;
+	}
+
+	list.movies[list.size++] = newMovie;
+	std::cout << GREEN << "Movie added successfully.\n" << RESET;
+}
+
+void addNewMovie(MovieList& list) {
+	char* newTitle = readStringWithRetry("Enter movie title: ");
+	int newYear = readIntWithRetry("Enter movie year: ");
+	char* newGenre = readStringWithRetry("Enter movie genre: ");
+	char* newDirector = readStringWithRetry("Enter movie director: ");
+
+	Movie* newMovie = new Movie;
+	initializeMovie(*newMovie, newTitle, newYear, newGenre, newDirector);
+	addRatingToMovie(*newMovie, 5.0f);
+
+	int actorCount = readIntWithRetry("Enter the number of actors: ", 1);
+	for (int i = 0; i < actorCount; ++i) {
+		char* actorName = readStringWithRetry("Enter name of actor: ");
+		addActorToMovie(*newMovie, actorName);
+		delete[] actorName;
+	}
+
+	addMovieToList(list, newMovie);
+	serialize("s.txt", list.movies, list.size);
+}
+
+void editMovie(MovieList& list, const char* movieTitle) {
+	for (int i = 0; i < list.size; ++i) {
+		if (contains(list.movies[i]->title, movieTitle)) {
+			std::cout << "Editing Movie: " << list.movies[i]->title << std::endl;
+
+			updateStringField(list.movies[i]->title, "Enter new title (or press Enter to keep): ");
+
+			int newYear = readIntWithRetry("Enter new year (or press 0 to keep): ", 0);
+			if (newYear != 0) {
+				list.movies[i]->year = newYear;
+			}
+
+			updateStringField(list.movies[i]->genre, "Enter new genre (or press Enter to keep): ");
+
+			updateStringField(list.movies[i]->director, "Enter new director (or press Enter to keep): ");
+
+			float newRating = readFloatWithRetry("Enter new rating (or press 0 to keep the current ratings): ", 0, 10);
+			if (newRating >= 1 && newRating <= 10) {
+				clearRatingList(list.movies[i]->ratings);
+				addRatingToMovie(*list.movies[i], newRating);
+			}
+
+			char editActors;
+			std::cout << "Would you like to edit the actors? (y/n): ";
+			std::cin >> editActors;
+			if (editActors == 'y' || editActors == 'Y') {
+				clearActorList(list.movies[i]->actors);
+
+				int actorCount = readIntWithRetry("Enter the number of actors: ", 1);
+				for (int j = 0; j < actorCount; ++j) {
+					char* actorName = readStringWithRetry("Enter actor name: ");
+					addActorToMovie(*list.movies[i], actorName);
+					delete[] actorName;
+				}
+			}
+
+			std::cout << "Movie edited successfully.\n";
+			serialize("s.txt", list.movies, list.size);
+			return;
+		}
+	}
+	std::cout << RED << "Movie with title \"" << movieTitle << "\" not found.\n" << RESET;
+}
+
+
+void deleteMovieByTitle(MovieList& list, const char* title) {
+	for (int i = 0; i < list.size; ++i) {
+		if (contains(list.movies[i]->title, title)) {
+			destroyMovie(*list.movies[i]);
+			delete list.movies[i];
+
+			for (int j = i; j < list.size - 1; ++j) {
+				list.movies[j] = list.movies[j + 1];
+			}
+
+			list.size--;
+			std::cout << GREEN << "Movie with title \"" << title << "\" deleted successfully.\n" << RESET;
+			serialize("s.txt", list.movies, list.size);
+			return;
+		}
+	}
+	std::cout << RED << "Movie with title \"" << title << "\" not found.\n" << RESET;
+}
+
+void searchMoviesByGenre(const MovieList& list, const char* genre) {
+	bool found = false;
+	std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+	for (int i = 0; i < list.size; ++i) {
+		if (contains(list.movies[i]->genre, genre)) {
+			printMovieDetails(*list.movies[i]);
+			std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+			found = true;
+		}
+	}
+	if (!found) {
+		std::cout << "No movies found with genre: " << genre << std::endl;
+	}
+}
+
+void searchMoviesByTitle(const MovieList& list, const char* title) {
+	bool found = false;
+	std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+	for (int i = 0; i < list.size; ++i) {
+		if (contains(list.movies[i]->title, title)) {
+			printMovieDetails(*list.movies[i]);
+			std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+			found = true;
+		}
+	}
+	if (!found) {
+		std::cout << "No movies found with title: " << title << std::endl;
+	}
+}
+
+void filterMoviesByRating(const MovieList& list, float rating) {
+
+	std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+	for (int i = 0; i < list.size; ++i) {
+		if (calculateAverageRating(list.movies[i]->ratings) >= rating)
+		{
+			printMovieDetails(*list.movies[i]);
+			std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+		}
+	}
+}
+
+void printMovies(const MovieList& list) {
+	std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+	for (int i = 0; i < list.size; ++i) {
+		std::cout << GREEN << "Movie " << i + 1 << ":" << RESET << std::endl;
+		printMovieDetails(*list.movies[i]);
+		std::cout << CYAN << "------------------------------------" << RESET << std::endl;
+	}
+}
+
+void sortMoviesByAverageRating(MovieList& list, bool ascending = true) {
+	for (int i = 0; i < list.size - 1; ++i) {
+		for (int j = 0; j < list.size - i - 1; ++j) {
+			float rating1 = calculateAverageRating(list.movies[j]->ratings);
+			float rating2 = calculateAverageRating(list.movies[j + 1]->ratings);
+
+			bool condition = ascending ? rating1 > rating2 : rating1 < rating2;
+			if (condition) {
+				Movie* temp = list.movies[j];
+				list.movies[j] = list.movies[j + 1];
+				list.movies[j + 1] = temp;
+			}
+		}
+	}
+	std::cout << "Movies sorted by average rating " << (ascending ? "ascending" : "descending") << ".\n";
+}
+
+void sortMoviesByTitle(MovieList& list, bool ascending = true) {
+	for (int i = 0; i < list.size - 1; ++i) {
+		for (int j = 0; j < list.size - i - 1; ++j) {
+			bool condition = ascending
+				? stringComp(list.movies[j]->title, list.movies[j + 1]->title) > 0
+				: stringComp(list.movies[j]->title, list.movies[j + 1]->title) < 0;
+			if (condition) {
+				// Swap the movies
+				Movie* temp = list.movies[j];
+				list.movies[j] = list.movies[j + 1];
+				list.movies[j + 1] = temp;
+			}
+		}
+	}
+	std::cout << "Movies sorted by title " << (ascending ? "ascending" : "descending") << ".\n";
+}
+
+void addRatingToMovieByTitle(MovieList& list) {
+	char* title = readStringWithRetry("Enter the title of the movie to add a rating to: ");
+
+	for (int i = 0; i < list.size; ++i) {
+		if (contains(list.movies[i]->title, title)) {
+			std::cout << "Found movie: " << list.movies[i]->title << std::endl;
+			float newRating = readFloatWithRetry("Enter the new rating (1 to 10): ", 1.0f, 10.0f);
+			addRatingToMovie(*list.movies[i], newRating);
+			serialize("s.txt", list.movies, list.size);
+			std::cout << GREEN << "Rating added successfully.\n" << RESET;
+			delete[] title;
+			return;
+		}
+	}
+
+	std::cout << "Movie with title \"" << title << "\" not found.\n";
+	delete[] title;
+}
