@@ -4,6 +4,7 @@
 #include "Movie.h"
 #include "Serializable.h"
 #include "FileUtils.h"
+#include "NumberUtils.h"
 
 struct MovieList {
 	Movie** movies;

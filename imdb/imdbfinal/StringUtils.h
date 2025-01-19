@@ -1,5 +1,7 @@
 #pragma once
 #include "Constants.h"
+#include "CharUtils.h"
+#include <iostream>
 
 // returns length of the string
 size_t stringLen(const char* str) {
@@ -48,22 +50,6 @@ int stringComp(const char* const str1, const char* const str2) {
 	}
 
 	return str1[i] - str2[j];
-}
-
-bool isUpperCase(char c) {
-	return c >= 'A' && c <= 'Z';
-}
-
-bool isDigit(char c) {
-	return c >= '0' && c <= '9';
-}
-
-char toLowerChar(char c) {
-	if (isUpperCase(c))
-	{
-		return c + TO_LOWER_CONVERSION;
-	}
-	return c;
 }
 
 // case insensitive search for a substring
@@ -215,69 +201,6 @@ char* readStringWithRetry(const char* const prompt, const char* errorMessage = "
 		return readStringWithRetry(prompt);
 	}
 	return input;
-}
-
-int readInt(const char* prompt) {
-	char* input = readString(prompt);
-
-	if (!input)
-	{
-		delete[] input;
-		return MIN_INT_SIZE;
-	}
-
-	int result = customAtoi(input);
-	delete[] input;
-	return result;
-}
-
-int readIntWithRetry(const char* const prompt, const int min = MIN_INT_SIZE, const int max = MAX_INT_SIZE, const char* const errorMessage = "Please enter a valid integer.\n") {
-	int value;
-	while (true) {
-		value = readInt(prompt);
-		if (value == MIN_INT_SIZE) {
-			std::cout << RED << errorMessage << RESET;
-			continue;
-		}
-
-		if (value < min || value > max) {
-			std::cout << RED << "Input out of range.\n" << RESET;
-			continue;
-		}
-
-		return value;
-	}
-}
-
-float readFloat(const char* prompt) {
-	char* input = readString(prompt);
-
-	if (!input || *input == '\0') {
-		delete[] input;
-		return MIN_FLOAT_SIZE;
-	}
-
-	float result = customAtof(input);
-	delete[] input;
-	return result;
-}
-
-float readFloatWithRetry(const char* prompt, float min = MIN_FLOAT_SIZE, float max = MAX_FLOAT_SIZE, const char* const errorMessage = "Please enter a valid float.\n") {
-	float value;
-	while (true) {
-		value = readFloat(prompt);
-		if (value == MIN_FLOAT_SIZE) {
-			std::cout << RED << errorMessage << RESET;
-			continue;
-		}
-
-		if (value < min || value > max) {
-			std::cout << "Input out of range.\n";
-			continue;
-		}
-
-		return value;
-	}
 }
 
 void updateStringField(char*& field, const char* prompt) {

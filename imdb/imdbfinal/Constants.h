@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 
 // colour constants
 const char* RESET = "\033[0m";

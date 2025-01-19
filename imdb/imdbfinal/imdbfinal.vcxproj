@@ -132,10 +132,12 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="ActorList.h" />
+    <ClInclude Include="CharUtils.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="FileUtils.h" />
     <ClInclude Include="Movie.h" />
     <ClInclude Include="MovieList.h" />
+    <ClInclude Include="NumberUtils.h" />
     <ClInclude Include="RatingList.h" />
     <ClInclude Include="StringUtils.h" />
   </ItemGroup>
