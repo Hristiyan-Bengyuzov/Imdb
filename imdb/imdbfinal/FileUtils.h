@@ -105,7 +105,7 @@ void deserialize(const char* filePath, Movie**& movies, int& size, int& capacity
 
 		// add the movie
 		if (size == capacity) {
-			capacity *= 2;
+			capacity *= CAPACITY_MULTIPLY;
 			Movie** newMovies = new Movie * [capacity];
 			for (int i = 0; i < size; ++i) {
 				newMovies[i] = movies[i];

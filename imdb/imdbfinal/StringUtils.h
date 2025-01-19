@@ -186,7 +186,7 @@ float customAtof(const char* str) {
 
 	if (*str == '.') {
 		++str;
-		while (isdigit(*str)) {
+		while (isDigit(*str)) {
 			num = num * 10 + (*str + TO_INT_CONVERSION);
 			factor *= 10;
 			++str;
