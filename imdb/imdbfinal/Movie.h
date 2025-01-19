@@ -3,6 +3,20 @@
 #include "RatingList.h"
 #include "Constants.h"
 
+/**
+*
+* Solution to course project #6
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2024/2025
+*
+* @author Hristiyan Bengyuzov
+* @idnumber 8MI0600487* @compiler VC
+*
+* <file containing Movie struct and functions for working with it>
+*
+*/
+
 struct Movie {
 	char* title;
 	int year;

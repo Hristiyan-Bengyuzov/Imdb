@@ -1,6 +1,20 @@
 #include <iostream>
 #include "MovieList.h"
 
+/**
+*
+* Solution to course project #6
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2024/2025
+*
+* @author Hristiyan Bengyuzov
+* @idnumber 8MI0600487* @compiler VC
+*
+* <file containing main flow of the application>
+*
+*/
+
 // returns true if he chose ascending, otherwise false
 bool getUserSortingPreference() {
 	char* userPreference = readString("Enter your sorting preference (a for ascending, d for descending): ");
