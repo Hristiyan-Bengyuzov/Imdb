@@ -14,3 +14,7 @@ const int   MIN_INT_SIZE = std::numeric_limits<int>::min();
 const int   MAX_INT_SIZE = std::numeric_limits<int>::max();
 const float MIN_FLOAT_SIZE = std::numeric_limits<float>::min();
 const float MAX_FLOAT_SIZE = std::numeric_limits<float>::max();
+const float MIN_RATING = 1;
+const float MAX_RATING = 10;
+const char* ADMIN_USERNAME = "Admin";
+const char* ADMIN_PASSWORD = "Admin123";

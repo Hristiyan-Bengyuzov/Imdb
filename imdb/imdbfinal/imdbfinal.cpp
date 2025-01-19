@@ -1,8 +1,14 @@
 #include <iostream>
 #include "MovieList.h"
 
-const char* ADMIN_USERNAME = "Admin";
-const char* ADMIN_PASSWORD = "Admin123";
+bool checkIsAdmin() {
+	char* username = readStringWithRetry("Enter your username: ");
+	char* password = readStringWithRetry("Enter your password: ");
+	bool result = stringComp(username, ADMIN_USERNAME) == 0 && stringComp(password, ADMIN_PASSWORD) == 0;
+	delete[] username;
+	delete[] password;
+	return result;
+}
 
 void showHelp(bool isAdmin) {
 	std::cout << BOLD << "=============================================\n" << RESET;
@@ -101,7 +107,7 @@ void handleUserChoice(int choice, MovieList& movieList) {
 		sortMoviesByAverageRating(movieList, true);
 		break;
 	case 5: {
-		float rating = readFloatWithRetry("Enter minimal rating: ", 1, 10);
+		float rating = readFloatWithRetry("Enter minimal rating: ", MIN_RATING, MAX_RATING);
 		filterMoviesByRating(movieList, rating);
 		break;
 	}
@@ -138,7 +144,7 @@ void processChoices(bool isAdmin, MovieList& movieList) {
 }
 
 int main() {
-	bool isAdmin = true;
+	bool isAdmin = checkIsAdmin();
 	MovieList movieList;
 	initializeMovieList(movieList);
 
