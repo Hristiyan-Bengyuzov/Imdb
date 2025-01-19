@@ -1,6 +1,14 @@
 #include <iostream>
 #include "MovieList.h"
 
+// returns true if he chose ascending, otherwise false
+bool getUserSortingPreference() {
+	char* userPreference = readString("Enter your sorting preference (a for ascending, d for descending): ");
+	bool ascending = contains(userPreference, "a");
+	delete[] userPreference;
+	return ascending;
+}
+
 bool checkIsAdmin() {
 	char* username = readStringWithRetry("Enter your username: ");
 	char* password = readStringWithRetry("Enter your password: ");
@@ -56,10 +64,10 @@ void handleAdminChoice(int choice, MovieList& movieList) {
 		break;
 	}
 	case 4:
-		sortMoviesByTitle(movieList, true);
+		sortMoviesByTitle(movieList, getUserSortingPreference());
 		break;
 	case 5:
-		sortMoviesByAverageRating(movieList, true);
+		sortMoviesByAverageRating(movieList, getUserSortingPreference());
 		break;
 	case 6: {
 		char* title = readStringWithRetry("Enter movie title: ");
@@ -101,10 +109,10 @@ void handleUserChoice(int choice, MovieList& movieList) {
 		break;
 	}
 	case 3:
-		sortMoviesByTitle(movieList, true);
+		sortMoviesByTitle(movieList, getUserSortingPreference());
 		break;
 	case 4:
-		sortMoviesByAverageRating(movieList, true);
+		sortMoviesByAverageRating(movieList, getUserSortingPreference());
 		break;
 	case 5: {
 		float rating = readFloatWithRetry("Enter minimal rating: ", MIN_RATING, MAX_RATING);

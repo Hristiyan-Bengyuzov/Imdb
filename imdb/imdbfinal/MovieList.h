@@ -70,7 +70,7 @@ void addNewMovie(MovieList& list) {
 void editMovie(MovieList& list, const char* movieTitle) {
 	for (int i = 0; i < list.size; ++i) {
 		if (contains(list.movies[i]->title, movieTitle)) {
-			std::cout << "Editing Movie: " << list.movies[i]->title << std::endl;
+			std::cout << YELLOW << "Editing Movie: " << list.movies[i]->title << std::endl << RESET;
 
 			updateStringField(list.movies[i]->title, "Enter new title (or press Enter to keep): ");
 
@@ -89,10 +89,9 @@ void editMovie(MovieList& list, const char* movieTitle) {
 				addRatingToMovie(*list.movies[i], newRating);
 			}
 
-			char editActors;
-			std::cout << "Would you like to edit the actors? (y/n): ";
-			std::cin >> editActors;
-			if (editActors == 'y' || editActors == 'Y') {
+			char* editActors = readString("Would you like to edit the actors? (y/n): ");
+
+			if (contains(editActors, "y")) {
 				clearActorList(list.movies[i]->actors);
 
 				int actorCount = readIntWithRetry("Enter the number of actors: ", MIN_ACTOR_COUNT, MAX_ACTOR_COUNT);
@@ -103,7 +102,8 @@ void editMovie(MovieList& list, const char* movieTitle) {
 				}
 			}
 
-			std::cout << "Movie edited successfully.\n";
+			delete[] editActors;
+			std::cout << GREEN << "Movie edited successfully.\n" << RESET;
 			serialize(MOVIE_FILE_PATH, list.movies, list.size);
 			return;
 		}
@@ -142,7 +142,7 @@ void searchMoviesByGenre(const MovieList& list, const char* genre) {
 		}
 	}
 	if (!found) {
-		std::cout << "No movies found with genre: " << genre << std::endl;
+		std::cout << RED << "No movies found with genre: " << genre << std::endl << RESET;
 	}
 }
 
@@ -157,7 +157,7 @@ void searchMoviesByTitle(const MovieList& list, const char* title) {
 		}
 	}
 	if (!found) {
-		std::cout << "No movies found with title: " << title << std::endl;
+		std::cout << RED << "No movies found with title: " << title << std::endl << RESET;
 	}
 }
 
@@ -196,7 +196,7 @@ void sortMoviesByAverageRating(MovieList& list, bool ascending = true) {
 			}
 		}
 	}
-	std::cout << "Movies sorted by average rating " << (ascending ? "ascending" : "descending") << ".\n";
+	std::cout << GREEN << "Movies sorted by average rating " << (ascending ? "ascending" : "descending") << ".\n" << RESET;
 }
 
 void sortMoviesByTitle(MovieList& list, bool ascending = true) {
@@ -213,7 +213,7 @@ void sortMoviesByTitle(MovieList& list, bool ascending = true) {
 			}
 		}
 	}
-	std::cout << "Movies sorted by title " << (ascending ? "ascending" : "descending") << ".\n";
+	std::cout << GREEN << "Movies sorted by title " << (ascending ? "ascending" : "descending") << ".\n" << RESET;
 }
 
 void addRatingToMovieByTitle(MovieList& list) {
@@ -221,7 +221,7 @@ void addRatingToMovieByTitle(MovieList& list) {
 
 	for (int i = 0; i < list.size; ++i) {
 		if (contains(list.movies[i]->title, title)) {
-			std::cout << "Found movie: " << list.movies[i]->title << std::endl;
+			std::cout << "Found movie: " << GREEN << list.movies[i]->title << std::endl << RESET;
 			float newRating = readFloatWithRetry("Enter the new rating (1 to 10): ", MIN_RATING, MAX_RATING);
 			addRatingToMovie(*list.movies[i], newRating);
 			serialize(MOVIE_FILE_PATH, list.movies, list.size);
@@ -231,6 +231,6 @@ void addRatingToMovieByTitle(MovieList& list) {
 		}
 	}
 
-	std::cout << "Movie with title \"" << title << "\" not found.\n";
+	std::cout << RED << "Movie with title \"" << title << "\" not found.\n" << RESET;
 	delete[] title;
 }

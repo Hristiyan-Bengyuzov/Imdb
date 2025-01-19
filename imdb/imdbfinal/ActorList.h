@@ -16,7 +16,7 @@ void initializeActorList(ActorList& list, int initialCapacity = DEFAULT_CAPACITY
 
 void destroyActorList(ActorList& list) {
     for (int i = 0; i < list.size; ++i) {
-        destroyActor(*list.actors[i]);
+        destroyActor(*list.actors[i]); 
         delete list.actors[i];
     }
     delete[] list.actors;

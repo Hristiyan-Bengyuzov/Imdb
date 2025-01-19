@@ -18,7 +18,7 @@ void destroyRatingList(RatingList& list) {
 }
 
 void clearRatingList(RatingList& list) {
-    delete[] list.ratings;
+    destroyRatingList(list);
     list.ratings = new float[list.capacity];
     list.size = DEFAULT_SIZE;
 }
