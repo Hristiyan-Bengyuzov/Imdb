@@ -8,9 +8,9 @@ struct ActorList {
     int capacity;
 };
 
-void initializeActorList(ActorList& list, int initialCapacity = 2) {
+void initializeActorList(ActorList& list, int initialCapacity = DEFAULT_CAPACITY) {
     list.actors = new Actor * [initialCapacity];
-    list.size = 0;
+    list.size = DEFAULT_SIZE;
     list.capacity = initialCapacity;
 }
 
@@ -23,18 +23,14 @@ void destroyActorList(ActorList& list) {
 }
 
 void clearActorList(ActorList& list) {
-    for (int i = 0; i < list.size; ++i) {
-        destroyActor(*list.actors[i]);
-        delete list.actors[i];
-    }
-    delete[] list.actors;
+    destroyActorList(list);
     list.actors = new Actor * [list.capacity];
-    list.size = 0;
+    list.size = DEFAULT_SIZE;
 }
 
 void addActorToList(ActorList& list, const char* actorName) {
     if (list.size == list.capacity) {
-        list.capacity *= 2;
+        list.capacity *= CAPACITY_MULTIPLY;
         Actor** newActors = new Actor * [list.capacity];
         for (int i = 0; i < list.size; ++i) {
             newActors[i] = list.actors[i];
@@ -42,7 +38,7 @@ void addActorToList(ActorList& list, const char* actorName) {
         delete[] list.actors;
         list.actors = newActors;
     }
-    list.actors[list.size] = new Actor();
+    list.actors[list.size] = new Actor;
     initializeActor(*list.actors[list.size], actorName);
     list.size++;
 }

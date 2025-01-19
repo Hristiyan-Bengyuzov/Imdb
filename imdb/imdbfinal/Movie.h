@@ -18,8 +18,8 @@ void initializeMovie(Movie& movie, const char* movieTitle, int movieYear, const 
     movie.genre = stringCopy(movieGenre);
     movie.director = stringCopy(movieDirector);
 
-    initializeActorList(movie.actors, 2);
-    initializeRatingList(movie.ratings, 2);
+    initializeActorList(movie.actors, DEFAULT_CAPACITY);
+    initializeRatingList(movie.ratings, DEFAULT_CAPACITY);
 }
 
 void destroyMovie(Movie& movie) {

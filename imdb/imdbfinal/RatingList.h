@@ -7,9 +7,9 @@ struct RatingList {
     int capacity;
 };
 
-void initializeRatingList(RatingList& list, int initialCapacity = 2) {
+void initializeRatingList(RatingList& list, int initialCapacity = DEFAULT_CAPACITY) {
     list.ratings = new float[initialCapacity];
-    list.size = 0;
+    list.size = DEFAULT_SIZE;
     list.capacity = initialCapacity;
 }
 
@@ -20,12 +20,12 @@ void destroyRatingList(RatingList& list) {
 void clearRatingList(RatingList& list) {
     delete[] list.ratings;
     list.ratings = new float[list.capacity];
-    list.size = 0;
+    list.size = DEFAULT_SIZE;
 }
 
 void addRatingToList(RatingList& list, float rating) {
     if (list.size == list.capacity) {
-        list.capacity *= 2;
+        list.capacity *= CAPACITY_MULTIPLY;
         float* newRatings = new float[list.capacity];
         for (int i = 0; i < list.size; ++i) {
             newRatings[i] = list.ratings[i];

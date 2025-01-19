@@ -12,11 +12,11 @@ struct MovieList {
 };
 
 
-void initializeMovieList(MovieList& list, int initialCapacity = 2) {
+void initializeMovieList(MovieList& list, const int initialCapacity = DEFAULT_CAPACITY) {
 	list.movies = new Movie * [initialCapacity];
-	list.size = 0;
+	list.size = DEFAULT_SIZE;
 	list.capacity = initialCapacity;
-	deserialize("s.txt", list.movies, list.size, list.capacity);
+	deserialize(MOVIE_FILE_PATH, list.movies, list.size, list.capacity);
 }
 
 void destroyMovieList(MovieList& list) {
@@ -33,7 +33,7 @@ void addMovieToList(MovieList& list, Movie* newMovie) {
 	}
 
 	if (list.size == list.capacity) {
-		list.capacity *= 2;
+		list.capacity *= CAPACITY_MULTIPLY;
 		Movie** newMovies = new Movie * [list.capacity];
 		for (int i = 0; i < list.size; ++i) {
 			newMovies[i] = list.movies[i];
@@ -48,15 +48,15 @@ void addMovieToList(MovieList& list, Movie* newMovie) {
 
 void addNewMovie(MovieList& list) {
 	char* newTitle = readStringWithRetry("Enter movie title: ");
-	int newYear = readIntWithRetry("Enter movie year: ");
+	int newYear = readIntWithRetry("Enter movie year: ", MIN_MOVIE_YEAR, MAX_MOVIE_YEAR, "Enter a valid movie year.\n");
 	char* newGenre = readStringWithRetry("Enter movie genre: ");
 	char* newDirector = readStringWithRetry("Enter movie director: ");
 
 	Movie* newMovie = new Movie;
 	initializeMovie(*newMovie, newTitle, newYear, newGenre, newDirector);
-	addRatingToMovie(*newMovie, 5.0f);
+	addRatingToMovie(*newMovie, DEFAULT_RATING);
 
-	int actorCount = readIntWithRetry("Enter the number of actors: ", 1);
+	int actorCount = readIntWithRetry("Enter the number of actors: ", MIN_ACTOR_COUNT, MAX_ACTOR_COUNT, "Invalid actor count.\n");
 	for (int i = 0; i < actorCount; ++i) {
 		char* actorName = readStringWithRetry("Enter name of actor: ");
 		addActorToMovie(*newMovie, actorName);
@@ -64,7 +64,7 @@ void addNewMovie(MovieList& list) {
 	}
 
 	addMovieToList(list, newMovie);
-	serialize("s.txt", list.movies, list.size);
+	serialize(MOVIE_FILE_PATH, list.movies, list.size);
 }
 
 void editMovie(MovieList& list, const char* movieTitle) {
@@ -74,7 +74,7 @@ void editMovie(MovieList& list, const char* movieTitle) {
 
 			updateStringField(list.movies[i]->title, "Enter new title (or press Enter to keep): ");
 
-			int newYear = readIntWithRetry("Enter new year (or press 0 to keep): ", 0);
+			int newYear = readIntWithRetry("Enter new year (or press 0 to keep): ", 0, MAX_MOVIE_YEAR);
 			if (newYear != 0) {
 				list.movies[i]->year = newYear;
 			}
@@ -83,8 +83,8 @@ void editMovie(MovieList& list, const char* movieTitle) {
 
 			updateStringField(list.movies[i]->director, "Enter new director (or press Enter to keep): ");
 
-			float newRating = readFloatWithRetry("Enter new rating (or press 0 to keep the current ratings): ", 0, 10);
-			if (newRating >= 1 && newRating <= 10) {
+			float newRating = readFloatWithRetry("Enter new rating (or press 0 to keep the current ratings): ", 0, MAX_RATING);
+			if (newRating >= MIN_RATING && newRating <= MAX_RATING) {
 				clearRatingList(list.movies[i]->ratings);
 				addRatingToMovie(*list.movies[i], newRating);
 			}
@@ -95,7 +95,7 @@ void editMovie(MovieList& list, const char* movieTitle) {
 			if (editActors == 'y' || editActors == 'Y') {
 				clearActorList(list.movies[i]->actors);
 
-				int actorCount = readIntWithRetry("Enter the number of actors: ", 1);
+				int actorCount = readIntWithRetry("Enter the number of actors: ", MIN_ACTOR_COUNT, MAX_ACTOR_COUNT);
 				for (int j = 0; j < actorCount; ++j) {
 					char* actorName = readStringWithRetry("Enter actor name: ");
 					addActorToMovie(*list.movies[i], actorName);
@@ -104,7 +104,7 @@ void editMovie(MovieList& list, const char* movieTitle) {
 			}
 
 			std::cout << "Movie edited successfully.\n";
-			serialize("s.txt", list.movies, list.size);
+			serialize(MOVIE_FILE_PATH, list.movies, list.size);
 			return;
 		}
 	}
@@ -124,7 +124,7 @@ void deleteMovieByTitle(MovieList& list, const char* title) {
 
 			list.size--;
 			std::cout << GREEN << "Movie with title \"" << title << "\" deleted successfully.\n" << RESET;
-			serialize("s.txt", list.movies, list.size);
+			serialize(MOVIE_FILE_PATH, list.movies, list.size);
 			return;
 		}
 	}
@@ -222,9 +222,9 @@ void addRatingToMovieByTitle(MovieList& list) {
 	for (int i = 0; i < list.size; ++i) {
 		if (contains(list.movies[i]->title, title)) {
 			std::cout << "Found movie: " << list.movies[i]->title << std::endl;
-			float newRating = readFloatWithRetry("Enter the new rating (1 to 10): ", 1.0f, 10.0f);
+			float newRating = readFloatWithRetry("Enter the new rating (1 to 10): ", MIN_RATING, MAX_RATING);
 			addRatingToMovie(*list.movies[i], newRating);
-			serialize("s.txt", list.movies, list.size);
+			serialize(MOVIE_FILE_PATH, list.movies, list.size);
 			std::cout << GREEN << "Rating added successfully.\n" << RESET;
 			delete[] title;
 			return;
