@@ -17,16 +17,20 @@ int readIntFromFile(std::ifstream& ifs, char* buffer, size_t size) {
 	return 0;
 }
 
-float* readRatingsFromFile(std::ifstream& ifs, char* buffer, size_t size, int& ratingCount) {
+int countItemsInBuffer(const char* buffer, const size_t size) {
+	int count = 0;
+	for (int i = 0; i < size && buffer[i] != '\0'; ++i) {
+		if (buffer[i] == ',') {
+			count++;
+		}
+	}
+	return count + 1;
+}
+
+float* readRatingsFromFile(std::ifstream& ifs, char* buffer, const size_t size, int& ratingCount) {
 	if (ifs.getline(buffer, size)) {
 		// counting ratings
-		ratingCount = 0;
-		for (int i = 0; i < size && buffer[i] != '\0'; ++i) {
-			if (buffer[i] == ',') {
-				ratingCount++;
-			}
-		}
-		ratingCount++; // the rating after the final comma
+		ratingCount = countItemsInBuffer(buffer, size);
 
 		float* ratings = new float[ratingCount];
 		char* ratingToken = customStrtok(buffer, ",");
@@ -43,17 +47,10 @@ float* readRatingsFromFile(std::ifstream& ifs, char* buffer, size_t size, int& r
 }
 
 
-char** readActorsFromFile(std::ifstream& ifs, char* buffer, size_t size, int& actorCount) {
+char** readActorsFromFile(std::ifstream& ifs, char* buffer, const size_t size, int& actorCount) {
 	if (ifs.getline(buffer, size)) {
 		// count actors
-		actorCount = 0;
-		for (int i = 0; i < size && buffer[i] != '\0'; ++i) {
-			if (buffer[i] == ',') {
-				actorCount++;
-			}
-		}
-		actorCount++;  // the actor after the final comma
-
+		actorCount = countItemsInBuffer(buffer, size);
 
 		char** actors = new char* [actorCount];
 		char* actorToken = customStrtok(buffer, ",");

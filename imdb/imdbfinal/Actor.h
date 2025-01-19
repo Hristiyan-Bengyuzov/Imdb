@@ -6,9 +6,9 @@ struct Actor {
 };
 
 void initializeActor(Actor& actor, const char* actorName) {
-    actor.name = stringCopy(actorName);
+	actor.name = stringCopy(actorName);
 }
 
 void destroyActor(Actor& actor) {
-    delete[] actor.name;
+	delete[] actor.name;
 }
