@@ -119,25 +119,25 @@ const char* customStrChr(const char* str, char ch) {
 }
 
 // tokenizes string based on delimeters
-char* customStrtok(char* str, const char* delimiters) {
-	static char* nextToken = nullptr;
+char* customStrtok(char* str, const char* delimiters, char** context) {
 	if (str) {
-		nextToken = str;
+		*context = str;
 	}
-	if (!nextToken) {
+	if (!*context) {
 		return nullptr;
 	}
 
-	char* tokenStart = nextToken;
-	while (*nextToken && customStrChr(delimiters, *nextToken) == nullptr) {
-		++nextToken;
+	char* tokenStart = *context;
+	while (**context && customStrChr(delimiters, **context) == nullptr) {
+		++(*context);
 	}
 
-	if (*nextToken) {
-		*nextToken++ = '\0';
+	if (**context) {
+		**context = '\0';
+		(*context)++;
 	}
 	else {
-		nextToken = nullptr;
+		*context = nullptr;
 	}
 
 	return *tokenStart ? tokenStart : nullptr;

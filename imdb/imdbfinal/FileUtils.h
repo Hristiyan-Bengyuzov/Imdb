@@ -43,15 +43,16 @@ int countItemsInBuffer(const char* buffer, const size_t size) {
 
 float* readRatingsFromFile(std::ifstream& ifs, char* buffer, const size_t size, int& ratingCount) {
 	if (ifs.getline(buffer, size)) {
-		// counting ratings
+		// Count ratings
 		ratingCount = countItemsInBuffer(buffer, size);
 
 		float* ratings = new float[ratingCount];
-		char* ratingToken = customStrtok(buffer, ",");
+		char* context = nullptr;
+		char* ratingToken = customStrtok(buffer, ",", &context);
 		int index = 0;
 		while (ratingToken) {
 			ratings[index++] = customAtof(ratingToken);
-			ratingToken = customStrtok(nullptr, ",");
+			ratingToken = customStrtok(nullptr, ",", &context);
 		}
 
 		return ratings;
@@ -60,18 +61,18 @@ float* readRatingsFromFile(std::ifstream& ifs, char* buffer, const size_t size, 
 	return nullptr;
 }
 
-
 char** readActorsFromFile(std::ifstream& ifs, char* buffer, const size_t size, int& actorCount) {
 	if (ifs.getline(buffer, size)) {
-		// count actors
+		// Count actors
 		actorCount = countItemsInBuffer(buffer, size);
 
 		char** actors = new char* [actorCount];
-		char* actorToken = customStrtok(buffer, ",");
+		char* context = nullptr; 
+		char* actorToken = customStrtok(buffer, ",", &context);
 		int index = 0;
 		while (actorToken) {
-			actors[index++] = stringCopy(actorToken);  // Copy each token into the array
-			actorToken = customStrtok(nullptr, ",");
+			actors[index++] = stringCopy(actorToken);
+			actorToken = customStrtok(nullptr, ",", &context);
 		}
 
 		return actors;
